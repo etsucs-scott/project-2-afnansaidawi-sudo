@@ -1,0 +1,96 @@
+@startuml War Card Game
+
+' Enums
+enum Suit {
+    Hearts
+    Diamonds
+    Clubs
+    Spades
+}
+
+enum Rank {
+    Two = 2
+    Three = 3
+    Four = 4
+    Five = 5
+    Six = 6
+    Seven = 7
+    Eight = 8
+    Nine = 9
+    Ten = 10
+    Jack = 11
+    Queen = 12
+    King = 13
+    Ace = 14
+}
+
+' Card class
+class Card {
+    {field} Suit Suit
+    {field} Rank Rank
+    {method} Card(Suit, Rank)
+    {method} int CompareTo(Card other)
+    {method} string ToString()
+}
+
+Card --> Suit : has
+Card --> Rank : has
+Card ..|> IComparable
+
+' Deck class
+class Deck {
+    {field} Stack<Card> _cards
+    {field} int Count
+    {method} Deck()
+    {method} Card Deal()
+}
+
+Deck o-- Card : contains 52
+
+' Hand class
+class Hand {
+    {field} Queue<Card> _cards
+    {field} int Count
+    {method} void AddCard(Card)
+    {method} Card PlayCard()
+    {method} bool HasCards()
+}
+
+Hand o-- Card : contains
+
+' WarEngine class
+class WarEngine {
+    {field} Dictionary<string, Hand> PlayerHands
+    {field} List<Card> pot
+    {field} Dictionary<string, Card> played
+    {field} const int RoundLimit = 10000
+    {method} void StartGame(int playerCount)
+    {method} void PlayRound(List<string>, List<Card>, bool)
+    {method} void GivePotToWinner(string, List<Card>)
+    {method} string GetPlayerCardCountSummary()
+}
+
+WarEngine *-- Hand : manages
+WarEngine *-- Card : uses
+WarEngine --> Deck : uses
+
+interface IComparable {
+    int CompareTo(T other)
+}
+
+' Relationships
+note right of WarEngine
+  Manages game state:
+  - Distributes deck to players
+  - Tracks active players
+  - Handles round logic
+  - Manages pot distribution
+end note
+
+note right of Deck
+  Standard 52-card deck
+  Shuffled on creation
+  Implements Stack<Card>
+end note
+
+@enduml
